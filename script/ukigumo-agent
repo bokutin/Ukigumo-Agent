@@ -20,6 +20,7 @@ use Plack::App::File;
 my $port = 1984;
 my $host = '127.0.0.1';
 GetOptions(
+    'mount=s'      => \my $mount,
     'work_dir=s'   => \my $work_dir,
     'server_url=s' => \my $server_url,
     'h|host=s' => \$host,
@@ -27,6 +28,8 @@ GetOptions(
 );
 $work_dir or pod2usage();
 $server_url or pod2usage();
+$mount //= '/';
+my $mount_static = File::Spec->catdir($mount, "static/");
 
 my $manager = Ukigumo::Agent::Manager->new(
     work_dir   => $work_dir,
@@ -37,10 +40,10 @@ Ukigumo::Agent->register_manager($manager);
 my $app = builder {
     enable 'AccessLog';
 
-    mount '/static/' => Plack::App::File->new(
+    mount $mount_static => Plack::App::File->new(
         {root => File::Spec->catdir(Ukigumo::Agent->share_dir, 'static')}
     )->to_app;
-    mount '/' => Ukigumo::Agent->to_app();
+    mount $mount => Ukigumo::Agent->to_app();
 };
 
 my $twiggy = Twiggy::Server->new(
@@ -66,6 +69,7 @@ ukigumo-agent.pl - CI agent server
         --work_dir=/tmp/                 working directory
         --host=127.0.0.1                 Bind host
         --port=80                        Bind port(Default: 1984)
+        --mount=/                        mount path
 
 =head1 DESCRIPTION
 
