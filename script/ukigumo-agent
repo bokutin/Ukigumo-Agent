@@ -35,6 +35,8 @@ my $manager = Ukigumo::Agent::Manager->new(
 Ukigumo::Agent->register_manager($manager);
 
 my $app = builder {
+    enable 'ReverseProxy';
+    enable 'ReverseProxyPath';
     enable 'AccessLog';
 
     mount '/static/' => Plack::App::File->new(
