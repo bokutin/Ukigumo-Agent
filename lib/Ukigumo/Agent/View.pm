@@ -20,7 +20,6 @@ sub make_instance {
         ],
         function => {
             time => sub { time() },
-            uri_for => sub { Amon2->context()->uri_for(@_) },
         },
     );
 }
